@@ -1,9 +1,25 @@
-import React from 'react'
+import styled, { css } from "styled-components";
 
-function Row() {
-  return (
-    <div>Row</div>
-  )
-}
+const Row = styled.div`
+  display: flex;
 
-export default Row
+  ${(props) =>
+    props.type === "horizontal" &&
+    css`
+      justify-content: space-between;
+      align-items: center;
+    `}
+
+  ${(props) =>
+    props.type === "vertical" &&
+    css`
+      flex-direction: column;
+      gap: 1.6rem;
+    `}
+`;
+
+Row.defaultProps = {
+  type: "vertical",
+};
+
+export default Row;
