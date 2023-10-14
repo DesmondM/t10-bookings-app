@@ -1,3 +1,4 @@
+import { th } from 'date-fns/locale';
 import supabase from './supabase'
 export async function getRooms() {
     const { data, error } = await supabase.from("rooms").select("*");
@@ -8,4 +9,18 @@ export async function getRooms() {
     }
     
     return data;
+    }
+
+export async function deleteRoom(id) {  
+const {data, error } = await supabase
+.from('rooms')
+.delete()
+.eq('id', id)
+if (error) {
+    throw new Error("Room could not be deleted");
+}
+return data;
+
+
+
     }

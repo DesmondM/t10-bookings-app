@@ -11,6 +11,7 @@ import Account from "./pages/Account";
 import Login from "./pages/Login";
 import PageNotFound from "./pages/PageNotFound";
 import AppLayout from "./ui/AppLayout";
+import { Toaster } from "react-hot-toast";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -41,6 +42,21 @@ function App() {
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </BrowserRouter>
+      <Toaster
+        position="bottom-center"
+        containerStyle={{ margin: "5rem" }}
+        toastOptions={{
+          success: {
+           duration: 3000,
+          },
+            error: {
+            duration: 4000,
+            },
+            style: {
+            fontFamily: "Sono",
+            },
+        }}
+      />
     </QueryClientProvider>
   );
 }
