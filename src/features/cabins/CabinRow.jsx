@@ -63,7 +63,7 @@ function CabinRow({ room  }) {
     <TableRow role="row">
         <Img src={image} alt={name} /> 
         <Room>{name}</Room>
-        <div> Fits up to {maxCapacity}</div>
+        <div> Fits up to {maxCapacity} - {description}</div>
         <Price>{formatCurrency(regularPrice)}</Price>
         <Discount>{formatCurrency(discount * regularPrice*0.01)}</Discount>
         <button onClick={()=>mutate(roomId)} disabled={isDeleting}>Delete</button>

@@ -1,4 +1,4 @@
-import { th } from 'date-fns/locale';
+
 import supabase from './supabase'
 export async function getRooms() {
     const { data, error } = await supabase.from("rooms").select("*");
@@ -10,6 +10,20 @@ export async function getRooms() {
     
     return data;
     }
+
+export async  function createRoom(newRoom) {
+    
+const { data, error } = await supabase
+.from('rooms')
+.insert([
+    newRoom
+])
+.select()
+if (error) {
+    throw new Error("Room could not be created");
+}
+
+};
 
 export async function deleteRoom(id) {  
 const {data, error } = await supabase
