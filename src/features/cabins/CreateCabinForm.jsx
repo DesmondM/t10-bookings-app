@@ -12,13 +12,19 @@ import FileInput from '../../ui/FileInput';
  import {Textarea} from '../../ui/Textarea';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
+import styled from 'styled-components';
 
-
+const Error = styled.span`
+font-size: 1.4rem;
+color: var(--color-red-700);
+`;
 
 function CreateCabinForm() {
  
-    const { register, handleSubmit, reset,  } = useForm();
- 
+    const { register, handleSubmit, reset, getValues, formState  } = useForm();
+     const { errors } = formState;
+    
+     console.log(errors);
     const queryClient = useQueryClient();
    
   const { mutate, isLoading: isCreating } = useMutation({
@@ -37,10 +43,10 @@ function CreateCabinForm() {
     mutate(data);
   }
   
-
+const onError = (errors, e) => console.log("###", errors, e);
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)} >
+    <Form onSubmit={handleSubmit(onSubmit, onError)} >
       <FormRow label='Room name' >
   
         <Input
@@ -48,6 +54,7 @@ function CreateCabinForm() {
           id='name'
           {...register('name' )}
         />
+         {errors?.name?.message && <Error>{errors.name.message}</Error>}
       </FormRow>
 
       <FormRow label='Maximum capacity'>
@@ -71,8 +78,9 @@ function CreateCabinForm() {
           type='number'
           id='discount'
           defaultValue={0}
-          {...register('discount')}
+          {...register('discount') }
         />
+       
       </FormRow>
 
       <FormRow
