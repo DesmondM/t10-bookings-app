@@ -54,6 +54,10 @@ function App() {
             },
             style: {
             fontFamily: "Sono",
+            maxWidth: "500px",
+            padding:"16px 24px",
+            color: "var(--color-grey-100)",
+            backgroundColor: "var(--color-grey-700)",
             },
         }}
       />

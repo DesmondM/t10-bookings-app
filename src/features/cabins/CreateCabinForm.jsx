@@ -47,55 +47,63 @@ const onError = (errors, e) => console.log("###", errors, e);
 
   return (
     <Form onSubmit={handleSubmit(onSubmit, onError)} >
-      <FormRow label='Room name' >
-  
+      <FormRow >
+         <label htmlFor='name'>Name</label>
         <Input
           type='text'
           id='name'
-          {...register('name' )}
+          {...register('name', { required: 'Name is required' } )}
         />
          {errors?.name?.message && <Error>{errors.name.message}</Error>}
       </FormRow>
 
-      <FormRow label='Maximum capacity'>
+      <FormRow >
+        <label htmlFor='maxCapacity'>Maximum capacity</label>
         <Input
           type='number'
           id='maxCapacity'
-          {...register('maxCapacity')}
+          {...register('maxCapacity', { 
+            required: 'Maximum capacity is required',
+            min: {value: 1, 
+                  message: 'Minimum should be at least 1'}, })}
         />
       </FormRow>
 
-      <FormRow label='Regular price' >
+      <FormRow  >
+        <label htmlFor='regularPrice'>Regular price</label>
         <Input
           type='number'
           id='regularPrice'
-          {...register('regularPrice')}
+          {...register('regularPrice', { required: 'Regular price is required' })}
         />
       </FormRow>
 
-      <FormRow label='Discount' >
+      <FormRow  >
+        <label htmlFor='discount'>Discount</label>
         <Input
           type='number'
           id='discount'
           defaultValue={0}
-          {...register('discount') }
+          {...register('discount', {
+            required:'Discount value is required',
+            validate: (value) =>value<getValues().regularPrice || 'Discount value should be less than regular price'
+        }) }
         />
        
       </FormRow>
 
-      <FormRow
-        label='Description for website'
-        
-      >
+      <FormRow      >
+        <label htmlFor='description'>Description</label>
         <Textarea
           type='number'
           id='description'
           defaultValue=''
-          {...register('description')}
+          {...register('description', {required:'Description is required'}) }
         />
       </FormRow>
 
-      <FormRow label='Room photo' >
+      <FormRow  >
+        <label htmlFor='image'>Image</label>
         <FileInput
           id='image'
           accept='image/*' />
