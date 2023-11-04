@@ -14,10 +14,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import styled from 'styled-components';
 
-const Error = styled.span`
-font-size: 1.4rem;
-color: var(--color-red-700);
-`;
 
 function CreateCabinForm() {
  
@@ -40,50 +36,53 @@ function CreateCabinForm() {
   });
 
   function onSubmit(data) {
-    mutate(data);
+  
+    mutate({...data, image: data.image[0]});
   }
   
 const onError = (errors, e) => console.log("###", errors, e);
 
   return (
     <Form onSubmit={handleSubmit(onSubmit, onError)} >
-      <FormRow >
-         <label htmlFor='name'>Name</label>
+      <FormRow label={'Room name'} error={errors?.name?.message}>
+        
         <Input
           type='text'
           id='name'
+          disabled={isCreating}
           {...register('name', { required: 'Name is required' } )}
         />
-         {errors?.name?.message && <Error>{errors.name.message}</Error>}
+       
       </FormRow>
 
-      <FormRow >
-        <label htmlFor='maxCapacity'>Maximum capacity</label>
+      <FormRow  label={'Maximum capacity'} error={errors?.maxCapacity?.message}>
         <Input
           type='number'
           id='maxCapacity'
+            disabled={isCreating}
           {...register('maxCapacity', { 
             required: 'Maximum capacity is required',
             min: {value: 1, 
                   message: 'Minimum should be at least 1'}, })}
         />
+        
       </FormRow>
 
-      <FormRow  >
-        <label htmlFor='regularPrice'>Regular price</label>
+      <FormRow  label={'Regular price'} error={errors?.regularPrice?.message} >
         <Input
           type='number'
           id='regularPrice'
+          disabled={isCreating}
           {...register('regularPrice', { required: 'Regular price is required' })}
         />
       </FormRow>
 
-      <FormRow  >
-        <label htmlFor='discount'>Discount</label>
+      <FormRow label={'Discount'} error={errors?.discount?.message} >
         <Input
           type='number'
           id='discount'
           defaultValue={0}
+          disabled={isCreating}
           {...register('discount', {
             required:'Discount value is required',
             validate: (value) =>value<getValues().regularPrice || 'Discount value should be less than regular price'
@@ -92,12 +91,12 @@ const onError = (errors, e) => console.log("###", errors, e);
        
       </FormRow>
 
-      <FormRow      >
-        <label htmlFor='description'>Description</label>
+      <FormRow  label={'Description'} error={errors?.description?.message}    >
         <Textarea
           type='number'
           id='description'
           defaultValue=''
+          disabled={isCreating}
           {...register('description', {required:'Description is required'}) }
         />
       </FormRow>
@@ -106,7 +105,10 @@ const onError = (errors, e) => console.log("###", errors, e);
         <label htmlFor='image'>Image</label>
         <FileInput
           id='image'
-          accept='image/*' />
+          accept='image/*' 
+          type='file'
+          {...register('image', { required: 'Image is required' })}
+          />
       </FormRow>
 
       <FormRow>
