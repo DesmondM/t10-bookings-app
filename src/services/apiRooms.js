@@ -12,19 +12,33 @@ export async function getRooms() {
     return data;
     }
 
-export async  function createRoom(newRoom) {
-    
+export async  function createEditRoom(newRoom, id) {  
     //https://zwtzhwytbgcppyipsifp.supabase.co/storage/v1/object/public/rooms-images/cabin-001.jpg
 const imageName = `${Math.random()}-${newRoom.image.name}`.replaceAll("/", "");
 
-const imagePath= `${supabaseUrl}/storage/v1/object/public/rooms-images/${imageName}`
+const hasImagePath = newRoom.image?.startsWith(supabaseUrl);
 
-const { data, error } = await supabase
-.from('rooms')
+const imagePath= hasImagePath? newRoom.image: `${supabaseUrl}/storage/v1/object/public/rooms-images/${imageName}`
+
+let query = supabase.from('rooms')
+
+//for create
+if(!id) query= query
 .insert([
    { ...newRoom, image: imagePath}
 ])
-.select()
+
+//for edit
+if(id) query= query
+.from('rooms')
+.update(
+    { ...newRoom, image: imagePath}
+ )
+.eq('id', id)
+
+
+ const {data, error } = await query.select()
+
 if (error) {
     throw new Error("Room could not be created");
 }

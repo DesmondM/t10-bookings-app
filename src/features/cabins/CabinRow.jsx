@@ -1,8 +1,10 @@
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import {formatCurrency} from "../../utils/helpers"
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteRoom } from '../../services/apiRooms';
 import toast from 'react-hot-toast';
+import CreateCabinForm from './CreateCabinForm';
 
 // v1
 const TableRow = styled.div`
@@ -47,6 +49,7 @@ const Discount = styled.div`
 
 function CabinRow({ room  }) {
 
+    const [showForm, setShowForm] = useState(false);
     const {id:roomId, name, description, maxCapacity, regularPrice, discount, image} = room;
 
     const queryClient=useQueryClient();
@@ -60,14 +63,19 @@ function CabinRow({ room  }) {
 
     })
   return (
+    <>
     <TableRow role="row">
         <Img src={image} alt={name} /> 
         <Room>{name}</Room>
         <div> Fits up to {maxCapacity} - {description}</div>
         <Price>{formatCurrency(regularPrice)}</Price>
         <Discount>{formatCurrency(discount * regularPrice*0.01)}</Discount>
+        <div ><button style={{margin:"10px"}} onClick={()=>setShowForm(show=>!show)}>Edit</button>
         <button onClick={()=>mutate(roomId)} disabled={isDeleting}>Delete</button>
+        </div>
         </TableRow>
+        {showForm&& <CreateCabinForm roomToEdit={room}/>}
+        </>
   );
 }
 

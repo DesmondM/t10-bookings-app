@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 
 // import { deleteRoom } from '../../services/apiRooms';
-import { createRoom } from '../../services/apiRooms';
+import { createEditRoom } from '../../services/apiRooms';
 // import { useCreateCabin } from 'features/cabins/useCreateCabin';
 import FormRow  from '../../ui/FormRow';
 import Input from '../../ui/Input';
@@ -15,16 +15,20 @@ import toast from 'react-hot-toast';
 import styled from 'styled-components';
 
 
-function CreateCabinForm() {
- 
-    const { register, handleSubmit, reset, getValues, formState  } = useForm();
+function CreateCabinForm({roomToEdit}) {
+ const {id:editId, ...editValues} = roomToEdit;
+ const isEditSession = Boolean(editId);
+
+    const { register, handleSubmit, reset, getValues, formState  } = useForm({
+        defaultValues: isEditSession? editValues:{}
+    });
      const { errors } = formState;
     
      console.log(errors);
     const queryClient = useQueryClient();
    
-  const { mutate, isLoading: isCreating } = useMutation({
-    mutationFn: createRoom,
+  const { mutate:createRoom, isLoading: isCreating } = useMutation({
+    mutationFn: createEditRoom,
     onSuccess: () => {
         toast.success('Room created successfully')
         queryClient.invalidateQueries({queryKey: ['rooms']})
@@ -34,10 +38,25 @@ function CreateCabinForm() {
         toast.error(err.message)
     }
   });
+  const { mutate: editRoom, isLoading: isDeleting } = useMutation({
+    mutationFn: ({newRoomData, id})=>createEditRoom(newRoomData, id),
+    onSuccess: () => {
+        toast.success('Room edited successfully')
+        queryClient.invalidateQueries({queryKey: ['rooms']})
+        reset()
+    },
+    onError: (err) => {
+        toast.error(err.message)
+    }
+  });
+
+  const isWorking = isCreating || isDeleting;
 
   function onSubmit(data) {
-  
-    mutate({...data, image: data.image[0]});
+
+    const image = typeof data.image === 'string'? data.image: data.image[0];
+    if (isEditSession) editRoom()
+    else editRoom({newRoomData: {...data, image}, id: editId});
   }
   
 const onError = (errors, e) => console.log("###", errors, e);
@@ -49,7 +68,7 @@ const onError = (errors, e) => console.log("###", errors, e);
         <Input
           type='text'
           id='name'
-          disabled={isCreating}
+          disabled={isWorking}
           {...register('name', { required: 'Name is required' } )}
         />
        
@@ -59,7 +78,7 @@ const onError = (errors, e) => console.log("###", errors, e);
         <Input
           type='number'
           id='maxCapacity'
-            disabled={isCreating}
+            disabled={isWorking}
           {...register('maxCapacity', { 
             required: 'Maximum capacity is required',
             min: {value: 1, 
@@ -72,7 +91,7 @@ const onError = (errors, e) => console.log("###", errors, e);
         <Input
           type='number'
           id='regularPrice'
-          disabled={isCreating}
+          disabled={isWorking}
           {...register('regularPrice', { required: 'Regular price is required' })}
         />
       </FormRow>
@@ -82,7 +101,7 @@ const onError = (errors, e) => console.log("###", errors, e);
           type='number'
           id='discount'
           defaultValue={0}
-          disabled={isCreating}
+          disabled={isWorking}
           {...register('discount', {
             required:'Discount value is required',
             validate: (value) =>value<getValues().regularPrice || 'Discount value should be less than regular price'
@@ -96,7 +115,7 @@ const onError = (errors, e) => console.log("###", errors, e);
           type='number'
           id='description'
           defaultValue=''
-          disabled={isCreating}
+          disabled={isWorking}
           {...register('description', {required:'Description is required'}) }
         />
       </FormRow>
@@ -107,7 +126,7 @@ const onError = (errors, e) => console.log("###", errors, e);
           id='image'
           accept='image/*' 
           type='file'
-          {...register('image', { required: 'Image is required' })}
+          {...register('image', { required: isEditSession? false: 'Image is required' })}
           />
       </FormRow>
 
@@ -118,8 +137,9 @@ const onError = (errors, e) => console.log("###", errors, e);
         >
           Cancel
         </Button>
-        <Button disabled={isCreating} >
-          Create new cabin
+        <Button disabled={isWorking} >
+            {isEditSession? 'Save changes' : 'Create new room'}
+          
         </Button>
       </FormRow>
     </Form>
