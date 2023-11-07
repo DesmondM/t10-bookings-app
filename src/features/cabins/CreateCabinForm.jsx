@@ -38,7 +38,7 @@ function CreateCabinForm({roomToEdit}) {
         toast.error(err.message)
     }
   });
-  const { mutate: editRoom, isLoading: isDeleting } = useMutation({
+  const { mutate: editRoom, isLoading: isEditing } = useMutation({
     mutationFn: ({newRoomData, id})=>createEditRoom(newRoomData, id),
     onSuccess: () => {
         toast.success('Room edited successfully')
@@ -46,17 +46,17 @@ function CreateCabinForm({roomToEdit}) {
         reset()
     },
     onError: (err) => {
-        toast.error(err.message)
+        toast.error(err.message + 'room could not be edited')
     }
   });
 
-  const isWorking = isCreating || isDeleting;
+  const isWorking = isCreating || isEditing;
 
   function onSubmit(data) {
 
     const image = typeof data.image === 'string'? data.image: data.image[0];
-    if (isEditSession) editRoom()
-    else editRoom({newRoomData: {...data, image}, id: editId});
+    if (isEditSession) editRoom({newRoomData: {...data, image}, id: editId})
+    else createRoom({newRoomData: {...data, image}, id: editId});
   }
   
 const onError = (errors, e) => console.log("###", errors, e);

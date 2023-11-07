@@ -23,21 +23,13 @@ const imagePath= hasImagePath? newRoom.image: `${supabaseUrl}/storage/v1/object/
 let query = supabase.from('rooms')
 
 //for create
-if(!id) query= query
-.insert([
-   { ...newRoom, image: imagePath}
-])
+if(!id) query = query.insert([{ ...newRoom, image: imagePath}])
 
 //for edit
-if(id) query= query
-.from('rooms')
-.update(
-    { ...newRoom, image: imagePath}
- )
-.eq('id', id)
+if(id) query= query.update({ ...newRoom, image: imagePath} ).eq('id', id)
 
 
- const {data, error } = await query.select()
+ const {data, error } = await query.select().single()
 
 if (error) {
     throw new Error("Room could not be created");
