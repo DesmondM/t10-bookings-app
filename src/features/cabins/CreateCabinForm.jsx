@@ -15,7 +15,7 @@ import toast from 'react-hot-toast';
 import styled from 'styled-components';
 
 
-function CreateCabinForm({roomToEdit}) {
+function CreateCabinForm({roomToEdit={}}) {
  const {id:editId, ...editValues} = roomToEdit;
  const isEditSession = Boolean(editId);
 
