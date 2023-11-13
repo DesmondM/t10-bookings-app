@@ -1,7 +1,6 @@
 import { useForm } from 'react-hook-form';
 
 // import { deleteRoom } from '../../services/apiRooms';
-import { createEditRoom } from '../../services/apiRooms';
 // import { useCreateCabin } from 'features/cabins/useCreateCabin';
 import FormRow  from '../../ui/FormRow';
 import Input from '../../ui/Input';
@@ -10,9 +9,10 @@ import Button from '../../ui/Button';
 import FileInput from '../../ui/FileInput';
 // import { useEditCabin } from './useEditCabin';
  import {Textarea} from '../../ui/Textarea';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import toast from 'react-hot-toast';
+import {  useQueryClient } from '@tanstack/react-query';
 import styled from 'styled-components';
+import { useCreateRoom } from './useCreateRoom';
+import { useEditRoom } from './useEditRoom';
 
 
 function CreateCabinForm({roomToEdit={}}) {
@@ -25,30 +25,14 @@ function CreateCabinForm({roomToEdit={}}) {
      const { errors } = formState;
     
      console.log(errors);
-    const queryClient = useQueryClient();
+    
+    const {isCreating, createRoom} = useCreateRoom();
+    const {isEditing, editRoom} = useEditRoom();
+
+     const queryClient = useQueryClient();
    
-  const { mutate:createRoom, isLoading: isCreating } = useMutation({
-    mutationFn: createEditRoom,
-    onSuccess: () => {
-        toast.success('Room created successfully')
-        queryClient.invalidateQueries({queryKey: ['rooms']})
-        reset()
-    },
-    onError: (err) => {
-        toast.error(err.message)
-    }
-  });
-  const { mutate: editRoom, isLoading: isEditing } = useMutation({
-    mutationFn: ({newRoomData, id})=>createEditRoom(newRoomData, id),
-    onSuccess: () => {
-        toast.success('Room edited successfully')
-        queryClient.invalidateQueries({queryKey: ['rooms']})
-        reset()
-    },
-    onError: (err) => {
-        toast.error(err.message + 'room could not be edited')
-    }
-  });
+
+
 
   const isWorking = isCreating || isEditing;
 
@@ -56,7 +40,13 @@ function CreateCabinForm({roomToEdit={}}) {
 
     const image = typeof data.image === 'string'? data.image: data.image[0];
     if (isEditSession) editRoom({newRoomData: {...data, image}, id: editId})
-    else createRoom({newRoomData: {...data, image}, id: editId});
+    else createRoom(
+      {...data, image:image}, 
+      {
+        onSuccess: (data)=>{
+        reset()
+        }
+    });
   }
   
 const onError = (errors, e) => console.log("###", errors, e);
