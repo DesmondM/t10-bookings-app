@@ -34,7 +34,7 @@ export async function createEditRoom(newRoom, id) {
     if (error) {
         throw new Error("Room could not be created");
     }
-
+    if(hasImagePath) return data;
     const { error: storageError } = await supabase.storage
         .from("rooms-images")
         .upload(imageName, newRoom.image)

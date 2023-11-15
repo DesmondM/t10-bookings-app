@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import {formatCurrency} from "../../utils/helpers"
+import { formatCurrency } from "../../utils/helpers"
 import CreateCabinForm from './CreateCabinForm';
 import { useDeleteRoom } from './useDeleteRoom';
+import { HiSquare2Stack, HiPencil, HiTrash } from 'react-icons/hi2'
+import { useCreateRoom } from './useCreateRoom';
 
 // v1
 const TableRow = styled.div`
@@ -45,34 +47,47 @@ const Discount = styled.div`
   color: var(--color-green-700);
 `;
 
-function CabinRow({ room  }) {
+function CabinRow({ room }) {
 
     const [showForm, setShowForm] = useState(false);
-    const {isDeleting, deleteRoom} = useDeleteRoom()
-    const {id:roomId, 
-        name, 
-        description, 
-        maxCapacity, 
-        regularPrice, 
-        discount, 
-        image} = room;
+    const { isDeleting, deleteRoom } = useDeleteRoom()
+    const { isCreating, createRoom } = useCreateRoom();
 
- 
-  return (
-    <>
-    <TableRow role="row">
-        <Img src={image} alt={name} /> 
-        <Room>{name}</Room>
-        <div> Fits up to {maxCapacity} - {description}</div>
-        <Price>{formatCurrency(regularPrice)}</Price>
-        <Discount>{formatCurrency(discount * regularPrice*0.01)}</Discount>
-        <div ><button style={{margin:"10px"}} onClick={()=>setShowForm(show=>!show)}>Edit</button>
-        <button onClick={()=>deleteRoom(roomId)} disabled={isDeleting}>Delete</button>
-        </div>
-        </TableRow>
-        {showForm&& <CreateCabinForm roomToEdit={room}/>}
+    const { id: roomId,
+        name,
+        description,
+        maxCapacity,
+        regularPrice,
+        discount,
+        image } = room;
+
+    function handleDuplicate() {
+        createRoom({
+            name: `Copy of ${name}`,
+            description,
+            maxCapacity,
+            regularPrice,
+            discount,
+            image
+        })
+    }
+
+    return (
+        <>
+            <TableRow role="row">
+                <Img src={image} alt={name} />
+                <Room>{name}</Room>
+                <div> Fits up to {maxCapacity} - {description}</div>
+                <Price>{formatCurrency(regularPrice)}</Price>
+                <Discount>{formatCurrency(discount * regularPrice * 0.01)}</Discount>
+                <div > <button disabled={isCreating} onClick={handleDuplicate}><HiSquare2Stack /></button>
+                    <button style={{ margin: "10px" }} onClick={() => setShowForm(show => !show)}><HiPencil /></button>
+                    <button onClick={() => deleteRoom(roomId)} disabled={isDeleting}><HiTrash /></button>
+                </div>
+            </TableRow>
+            {showForm && <CreateCabinForm roomToEdit={room} />}
         </>
-  );
+    );
 }
 
 export default CabinRow;
