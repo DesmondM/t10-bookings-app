@@ -15,7 +15,7 @@ import { useCreateRoom } from './useCreateRoom';
 import { useEditRoom } from './useEditRoom';
 
 
-function CreateCabinForm({roomToEdit={}}) {
+function CreateCabinForm({roomToEdit={}},onCloseModal) {
  const {id:editId, ...editValues} = roomToEdit;
  const isEditSession = Boolean(editId);
 
@@ -39,12 +39,20 @@ function CreateCabinForm({roomToEdit={}}) {
   function onSubmit(data) {
 
     const image = typeof data.image === 'string'? data.image: data.image[0];
-    if (isEditSession) editRoom({newRoomData: {...data, image}, id: editId})
+    if (isEditSession) editRoom({newRoomData: {...data, image}, id: editId},
+        {
+        onSuccess: (data)=>{
+        reset()
+        onCloseModal?.()
+        },
+    }
+    );
     else createRoom(
       {...data, image:image}, 
       {
         onSuccess: (data)=>{
         reset()
+        onCloseModal?.()
         }
     });
   }
@@ -52,7 +60,9 @@ function CreateCabinForm({roomToEdit={}}) {
 const onError = (errors, e) => console.log("###", errors, e);
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit, onError)} >
+    <Form onSubmit={handleSubmit(onSubmit, onError)} 
+    type={onCloseModal? 'modal': 'regular'}
+    >
       <FormRow label={'Room name'} error={errors?.name?.message}>
         
         <Input
@@ -124,7 +134,7 @@ const onError = (errors, e) => console.log("###", errors, e);
         <Button
           variation='secondary'
           type='reset'
-        >
+        onClick={()=>onCloseModal?.()}>
           Cancel
         </Button>
         <Button disabled={isWorking} >
