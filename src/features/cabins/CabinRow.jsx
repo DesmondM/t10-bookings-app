@@ -100,6 +100,16 @@ function CabinRow({ room }) {
                             </Modal.Window>
                             </Modal>
 
+                            <Menus.Menu>
+                                <Menus.Toggle id={cabinId}/>
+                                <Menus.List id={cabinId}>
+                                    <Menus.Button onClick={handleDuplicate}>Duplicate</Menus.Button>
+                                    <Menus.Button> Edit</Menus.Button>
+                                    <Menus.Button onClick={() => deleteRoom(roomId)}>Delete</Menus.Button>
+                                </Menus.List> 
+
+                            </Menus.Menu>
+
 
                                      
                 </div>
